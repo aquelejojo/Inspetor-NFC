@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e8c86" />
+  <title>Inspetor NFC</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- Barra superior -->
+    <header class="appbar">
+      <div class="wordmark">
+        <svg class="wordmark__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect x="10" y="10" width="28" height="28" rx="5" stroke="currentColor" stroke-width="3" />
+          <rect x="18" y="18" width="12" height="12" rx="2" fill="currentColor" />
+          <path d="M24 4v6M24 38v6M4 24h6M38 24h6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <div>
+          <div class="wordmark__name">Inspetor<span>NFC</span></div>
+          <div class="wordmark__tag">Análise de tags &amp; chips RFID</div>
+        </div>
+      </div>
+      <span id="mode-badge" class="badge badge--off">…</span>
+    </header>
+
+    <!-- Aviso de capacidade do dispositivo -->
+    <section id="banner" class="banner" aria-live="polite"></section>
+
+    <!-- Scanner: elemento-assinatura -->
+    <section id="scanner" class="scanner" data-estado="idle">
+      <div class="rf" aria-hidden="true">
+        <div class="rf__ring"></div>
+        <div class="rf__ring"></div>
+        <div class="rf__ring"></div>
+        <svg class="rf__chip" viewBox="0 0 48 48" fill="none">
+          <rect x="9" y="9" width="30" height="30" rx="6" stroke="currentColor" stroke-width="2.5" />
+          <rect x="18" y="18" width="12" height="12" rx="2" fill="currentColor" />
+          <path d="M24 3v6M24 39v6M3 24h6M39 24h6M14 4v5M34 4v5M14 39v5M34 39v5M4 14h5M4 34h5M39 14h5M39 34h5"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+        <div class="rf__check">
+          <svg viewBox="0 0 48 48" fill="none" width="48" height="48">
+            <circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="3" />
+            <path d="M15 24l6 6 12-13" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+      </div>
+      <div id="scan-status" class="scan-status">Pronto.</div>
+      <div id="scan-actions" class="scan-actions"></div>
+    </section>
+
+    <!-- Resultado da leitura -->
+    <section id="result" class="result" hidden>
+      <div id="r-ident" class="painel"></div>
+      <div id="r-tech" class="painel"></div>
+      <div id="r-ndef" class="painel col-full"></div>
+      <div id="r-memory" class="painel col-full" hidden></div>
+      <div id="export-bar" class="painel col-full export-bar">
+        <span class="secao-titulo">Exportar</span>
+        <button id="exp-json" class="btn btn--ghost">JSON</button>
+        <button id="exp-csv" class="btn btn--ghost">CSV (histórico)</button>
+        <button id="exp-txt" class="btn btn--ghost">TXT</button>
+        <button id="exp-print" class="btn btn--ghost">Imprimir / PDF</button>
+      </div>
+    </section>
+
+    <!-- Histórico / inventário -->
+    <section class="history">
+      <div class="history__head">
+        <span class="secao-titulo">Histórico de leituras</span>
+        <button id="history-clear" class="btn btn--ghost">Limpar</button>
+      </div>
+      <div id="history-list" class="history-list"></div>
+    </section>
+
+    <footer class="rodape">
+      Inspetor NFC · desenvolvido por <span id="credito">Duilio Souza</span>
+    </footer>
+
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

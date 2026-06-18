@@ -1,0 +1,229 @@
+/* =============================================================================
+   Inspetor NFC — instrumento de leitura (tema claro)
+   Direção: painel de instrumento de bancada. Dados em monoespaçada precisa,
+   micro-rótulos em maiúsculas, e o "campo RF" pulsante como elemento-assinatura.
+   ============================================================================= */
+
+:root {
+  --bg: #eef2f5;
+  --surface: #ffffff;
+  --ink: #14202b;
+  --muted: #5b6b79;
+  --line: #e3e9ed;
+  --signal: #0e8c86;
+  --signal-bright: #18c6ba;
+  --ink-blue: #16324f;
+  --amber: #d9821a;
+  --ok: #1e9e57;
+  --err: #d63a41;
+
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --r: 10px;
+  --shadow: 0 1px 2px rgba(20, 32, 43, .06), 0 4px 16px rgba(20, 32, 43, .05);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(14, 140, 134, .06), transparent 60%),
+    var(--bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 16px; }
+
+/* ---- App bar ------------------------------------------------------------- */
+.appbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 4px 18px;
+}
+.wordmark { display: flex; align-items: baseline; gap: 8px; }
+.wordmark__icon { width: 26px; height: 26px; align-self: center; }
+.wordmark__name { font-weight: 700; letter-spacing: -.01em; color: var(--ink-blue); font-size: 18px; }
+.wordmark__name span { color: var(--signal); }
+.wordmark__tag {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .14em;
+  color: var(--muted);
+}
+
+.badge {
+  font-size: 11px; font-weight: 600; letter-spacing: .04em;
+  padding: 5px 10px; border-radius: 999px; white-space: nowrap;
+  border: 1px solid var(--line);
+}
+.badge--live { color: var(--signal); border-color: color-mix(in srgb, var(--signal) 35%, var(--line)); background: color-mix(in srgb, var(--signal) 8%, var(--surface)); }
+.badge--usb  { color: var(--ink-blue); border-color: color-mix(in srgb, var(--ink-blue) 30%, var(--line)); background: color-mix(in srgb, var(--ink-blue) 6%, var(--surface)); }
+.badge--off  { color: var(--err); border-color: color-mix(in srgb, var(--err) 30%, var(--line)); background: color-mix(in srgb, var(--err) 7%, var(--surface)); }
+
+/* ---- Banner -------------------------------------------------------------- */
+.banner {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 12px 14px; border-radius: var(--r);
+  border: 1px solid var(--line); background: var(--surface);
+  margin-bottom: 18px; box-shadow: var(--shadow);
+  border-left-width: 4px;
+}
+.banner--ok   { border-left-color: var(--signal); }
+.banner--erro { border-left-color: var(--err); }
+.banner__titulo { font-size: 13px; }
+.banner__texto  { font-size: 13px; color: var(--muted); }
+
+/* ---- Scanner (assinatura) ----------------------------------------------- */
+.scanner {
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  padding: 28px 16px 30px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: var(--shadow); margin-bottom: 18px;
+}
+.rf {
+  position: relative; width: 200px; height: 200px;
+  display: grid; place-items: center;
+}
+.rf__ring {
+  position: absolute; inset: 0; margin: auto;
+  width: 64px; height: 64px; border-radius: 50%;
+  border: 2px solid var(--signal);
+  opacity: 0;
+}
+.rf__chip {
+  position: relative; z-index: 2; width: 64px; height: 64px;
+  color: var(--ink-blue);
+  transition: color .3s, transform .3s;
+}
+.rf__check {
+  position: absolute; z-index: 3; width: 64px; height: 64px;
+  display: grid; place-items: center; opacity: 0; transform: scale(.6);
+  transition: opacity .25s, transform .25s; color: var(--ok);
+}
+
+/* estados */
+.scanner[data-estado="scanning"] .rf__ring { animation: pulso 1.8s ease-out infinite; }
+.scanner[data-estado="scanning"] .rf__ring:nth-child(2) { animation-delay: .6s; }
+.scanner[data-estado="scanning"] .rf__ring:nth-child(3) { animation-delay: 1.2s; }
+.scanner[data-estado="scanning"] .rf__chip { color: var(--signal); }
+
+.scanner[data-estado="idle"] .rf__ring:first-child { animation: pulso 3.4s ease-out infinite; opacity: 0; }
+
+.scanner[data-estado="detected"] .rf__chip { opacity: 0; transform: scale(.6); }
+.scanner[data-estado="detected"] .rf__check { opacity: 1; transform: scale(1); }
+
+.scanner[data-estado="error"] .rf__chip { color: var(--err); }
+
+@keyframes pulso {
+  0%   { opacity: .55; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(2.6); }
+}
+
+.scan-status {
+  font-family: var(--mono); font-size: 13px; color: var(--muted);
+  min-height: 1.2em; text-align: center;
+}
+.scanner[data-estado="detected"] .scan-status { color: var(--ok); }
+.scanner[data-estado="error"] .scan-status { color: var(--err); }
+
+.scan-actions { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.nota-beta { font-size: 11px; color: var(--amber); margin: 0; text-align: center; max-width: 320px; }
+
+/* ---- Botões -------------------------------------------------------------- */
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 22px; background: var(--surface); color: var(--ink);
+  transition: background .15s, border-color .15s, transform .05s;
+}
+.btn:hover { border-color: var(--signal); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn--primary {
+  background: var(--signal); border-color: var(--signal); color: #fff;
+}
+.btn--primary:hover { background: color-mix(in srgb, var(--signal) 88%, #000); border-color: transparent; }
+.btn--ghost { padding: 7px 12px; font-size: 12px; }
+.btn:focus-visible { outline: 2px solid var(--signal-bright); outline-offset: 2px; }
+
+/* ---- Resultado ----------------------------------------------------------- */
+.result { display: grid; gap: 14px; margin-bottom: 18px; }
+@media (min-width: 680px) {
+  .result { grid-template-columns: 1fr 1fr; }
+  .result .col-full { grid-column: 1 / -1; }
+}
+.painel {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 14px 16px; box-shadow: var(--shadow);
+}
+.secao-titulo {
+  margin: 0 0 10px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: .12em; color: var(--muted); font-weight: 700;
+}
+
+.dado { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+.dado:last-child { border-bottom: 0; }
+.dado__rotulo { color: var(--muted); font-size: 13px; }
+.dado__valor { font-size: 13px; text-align: right; word-break: break-all; }
+
+.mono { font-family: var(--mono); }
+.obs { margin: 10px 0 0; padding-left: 16px; color: var(--muted); font-size: 12px; }
+.vazio { color: var(--muted); font-size: 13px; font-style: italic; margin: 4px 0; }
+
+/* NDEF */
+.ndef-reg { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+.ndef-reg:last-child { margin-bottom: 0; }
+.ndef-reg__cab { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.ndef-reg__tipo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--signal); }
+.ndef-reg__mime { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.ndef-reg__tam { margin-left: auto; font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.ndef-reg__valor { font-size: 13px; background: var(--bg); padding: 8px; border-radius: 6px; word-break: break-all; }
+.ndef-sub { border-left: 2px solid var(--line); padding-left: 10px; }
+.hex-det { margin-top: 8px; }
+.hex-det summary { font-size: 12px; color: var(--muted); cursor: pointer; }
+.hex-pre { font-size: 11px; background: var(--bg); padding: 8px; border-radius: 6px; overflow-x: auto; margin: 6px 0 0; }
+
+/* Memória */
+.mem-grid { display: grid; gap: 8px; }
+@media (min-width: 520px) { .mem-grid { grid-template-columns: 1fr 1fr; } }
+.mem-setor { border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.mem-setor--bloqueado { opacity: .55; }
+.mem-setor__cab { font-size: 11px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+.mem-bloco { display: flex; gap: 8px; font-size: 11px; }
+.mem-bloco__n { color: var(--signal); }
+.mem-bloco__hex { color: var(--ink); }
+
+/* Export bar */
+.export-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.export-bar .secao-titulo { margin: 0 8px 0 0; }
+
+/* ---- Histórico ----------------------------------------------------------- */
+.history { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; box-shadow: var(--shadow); margin-bottom: 28px; }
+.history__head { display: flex; align-items: center; justify-content: space-between; }
+.history-list { display: grid; gap: 6px; margin-top: 10px; }
+.hist-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;
+  text-align: left; background: var(--bg); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; cursor: pointer; font: inherit;
+}
+.hist-item:hover { border-color: var(--signal); }
+.hist-item__uid { font-size: 13px; color: var(--ink); }
+.hist-item__fab { font-size: 12px; color: var(--muted); grid-row: 2; }
+.hist-item__hora { font-size: 11px; color: var(--muted); align-self: center; grid-column: 2; grid-row: 1 / span 2; }
+
+.rodape { text-align: center; color: var(--muted); font-size: 11px; padding: 8px 0 24px; }
+.rodape span { color: var(--ink-blue); font-weight: 600; }
+
+/* ---- Acessibilidade / movimento ----------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .rf__ring { animation: none !important; opacity: .25 !important; }
+}
+
+/* ---- Impressão (gera PDF pelo navegador) -------------------------------- */
+@media print {
+  body { background: #fff; }
+  .appbar, .banner, .scanner, .history, .export-bar, .rodape { display: none !important; }
+  .result { display: block; }
+  .painel { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; margin-bottom: 10px; }
+}

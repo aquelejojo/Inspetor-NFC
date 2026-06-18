@@ -1,0 +1,13 @@
+{
+  "name": "Inspetor NFC",
+  "short_name": "Inspetor NFC",
+  "description": "Análise de tags NFC e chips RFID — leitura de UID, NDEF e (via leitor físico) setores e blocos.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef2f5",
+  "theme_color": "#0e8c86",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
